@@ -778,7 +778,7 @@ a:focus {
   display: flex;
   justify-content: center; 
   align-items: center;
-  gap: 20px;               
+  gap: 28px;               
 }
 
 .logo-stack img {
@@ -786,4 +786,16 @@ a:focus {
   width: auto;
   object-fit: contain;
   margin-bottom: 0rem;
+}
+
+.logo-stack .logo-row img.logo-westlake {
+  height: 96px;
+  width: auto;
+}
+
+/* ant_group.png has large canvas padding; taller height matches Westlake emblem */
+.logo-stack .logo-row img.logo-ant {
+  height: 248px;
+  width: auto;
+  max-width: min(420px, 72vw);
 }
