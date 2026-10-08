@@ -769,33 +769,34 @@ a:focus {
 
 .logo-stack {
   display: flex;
-  flex-direction: column; 
-  align-items: center;    
-  gap: 0rem;              
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  margin: 0 auto;
+  gap: 0.75rem;
 }
 
 .logo-row {
   display: flex;
-  justify-content: center; 
+  justify-content: center;
   align-items: center;
-  gap: 28px;               
+  width: 100%;
+  gap: 2.5rem;
 }
 
 .logo-stack img {
-  height: 100px;
+  display: block;
   width: auto;
   object-fit: contain;
-  margin-bottom: 0rem;
+  margin: 0;
 }
 
-.logo-stack .logo-row img.logo-westlake {
-  height: 96px;
-  width: auto;
+.logo-stack img.logo-westlake,
+.logo-stack img.logo-ant {
+  height: 92px;
 }
 
-/* ant_group.png has large canvas padding; taller height matches Westlake emblem */
-.logo-stack .logo-row img.logo-ant {
-  height: 248px;
-  width: auto;
-  max-width: min(420px, 72vw);
+.logo-stack img.logo-encode {
+  height: 90px;
 }
