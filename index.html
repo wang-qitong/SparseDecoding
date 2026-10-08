@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <meta name="title" content="SparseDecoding: Decoding-Aware Pruning for Accurate and Efficient LLM Inference">
+  <meta name="description" content="SparseDecoding aligns one-shot LLM pruning with autoregressive decoding activations and accelerates N:M sparse decoding with an optimized SpMV kernel.">
+  <meta name="keywords" content="SparseDecoding, LLM pruning, decoding, SparseGPT, N:M sparsity, SpMV">
+  <meta name="author" content="Qitong Wang, Xinwei Niu, Mingluo Su, Shanwei Zhao, Shiai Zhu, Huan Wang">
+  <meta name="robots" content="index, follow">
+
+  <meta property="og:type" content="article">
+  <meta property="og:site_name" content="Westlake University">
+  <meta property="og:title" content="SparseDecoding: Decoding-Aware Pruning for Accurate and Efficient LLM Inference">
+  <meta property="og:description" content="Decoding-aware calibration and optimized N:M SpMV kernels for accurate, efficient LLM inference.">
+  <meta property="og:url" content="https://wang-qitong.github.io/SparseDecoding-Webpage/">
+  <meta property="og:image" content="https://wang-qitong.github.io/SparseDecoding-Webpage/static/images/overview.png">
+
+  <title>SparseDecoding: Decoding-Aware Pruning for Accurate and Efficient LLM Inference</title>
+
+  <link rel="icon" type="image/x-icon" href="static/images/favicon.ico">
+  <link rel="stylesheet" href="static/css/bulma.min.css">
+  <link rel="stylesheet" href="static/css/index.css">
+  <link rel="preload" href="static/css/bulma-carousel.min.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
+  <link rel="preload" href="static/css/bulma-slider.min.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
+  <link rel="preload" href="static/css/fontawesome.all.min.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
+  <link rel="preload" href="https://cdn.jsdelivr.net/gh/jpswalsh/academicons@1/css/academicons.min.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
+  <noscript>
+    <link rel="stylesheet" href="static/css/bulma-carousel.min.css">
+    <link rel="stylesheet" href="static/css/bulma-slider.min.css">
+    <link rel="stylesheet" href="static/css/fontawesome.all.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/jpswalsh/academicons@1/css/academicons.min.css">
+  </noscript>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+  <script defer src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+  <script defer src="static/js/fontawesome.all.min.js"></script>
+  <script defer src="static/js/bulma-carousel.min.js"></script>
+  <script defer src="static/js/bulma-slider.min.js"></script>
+  <script defer src="static/js/index.js"></script>
+
+  <style>
+    .publication-authors { margin-bottom: 0.2rem; }
+    .motivation-row {
+      display: flex;
+      gap: 1.5rem;
+      align-items: flex-start;
+      justify-content: center;
+      margin-top: 0.5rem;
+    }
+    .motivation-row figure { flex: 1 1 0; margin: 0; min-width: 0; }
+    .motivation-row img { width: 100%; height: auto; display: block; }
+    @media (max-width: 768px) {
+      .motivation-row { flex-direction: column; }
+    }
+  </style>
+</head>
+<body>
+
+  <button class="scroll-to-top" onclick="scrollToTop()" title="Scroll to top" aria-label="Scroll to top">
+    <i class="fas fa-chevron-up"></i>
+  </button>
+
+  <main id="main-content">
+    <section class="hero">
+      <div class="hero-body" style="padding-bottom: 1rem;">
+        <div class="container is-max-desktop">
+          <div class="columns is-centered">
+            <div class="column has-text-centered">
+              <h1 class="title is-1 publication-title" style="margin-bottom: 0.5rem;">
+                SparseDecoding: Decoding-Aware Pruning for Accurate and Efficient LLM Inference
+              </h1>
+
+              <div class="is-size-3 has-text-weight-bold" style="color: #b31b1b; margin-bottom: 1.5rem;">
+                Preprint
+              </div>
+
+              <div class="is-size-5 publication-authors">
+                <span class="author-block"><a href="https://wang-qitong.github.io/" target="_blank" rel="noopener">Qitong Wang</a><sup>1,*</sup>,</span>
+                <span class="author-block"><a href="https://xinwei-niu.netlify.app/" target="_blank" rel="noopener">Xinwei Niu</a><sup>1,*</sup>,</span>
+                <span class="author-block"><a href="https://mingluo-su.github.io/" target="_blank" rel="noopener">Mingluo Su</a><sup>1</sup>,</span>
+                <span class="author-block">Shanwei Zhao<sup>2</sup>,</span>
+                <span class="author-block">Shiai Zhu<sup>2</sup>,</span>
+                <span class="author-block"><a href="https://huanwang.tech/" target="_blank" rel="noopener">Huan Wang</a><sup>1,†</sup></span>
+              </div>
+
+              <div class="is-size-5 publication-authors">
+                <span class="author-block"><sup>1</sup>Westlake University,</span>
+                <span class="author-block"><sup>2</sup>Ant Group</span>
+              </div>
+
+              <div class="is-size-7" style="margin-top: 0.5rem; margin-bottom: 1rem;">
+                <span class="author-block"><sup>*</sup>Equal contribution</span><br>
+                <span class="author-block"><sup>†</sup>Corresponding author: wanghuan [at] westlake [dot] edu [dot] cn</span>
+              </div>
+
+              <div class="columns is-centered logo-stack mb-0 pb-0">
+                <div class="logo-row">
+                  <div class="column is-narrow">
+                    <img src="static/images/westlake.png" alt="Westlake University" style="height: 90px;">
+                  </div>
+                </div>
+                <div class="column is-narrow">
+                  <img src="static/images/logo.jpg" alt="ENCODE Lab" style="height: 90px;">
+                </div>
+              </div>
+
+              <div class="column has-text-centered">
+                <div class="publication-links">
+                  <span class="link-block">
+                    <a href="#BibTeX" class="external-link button is-normal is-rounded is-dark">
+                      <span class="icon"><i class="fas fa-file-pdf"></i></span>
+                      <span>Paper (PDF soon)</span>
+                    </a>
+                  </span>
+                  <span class="link-block">
+                    <a href="https://github.com/wang-qitong/SparseDecoding" target="_blank" rel="noopener" class="external-link button is-normal is-rounded is-dark">
+                      <span class="icon"><i class="fab fa-github"></i></span>
+                      <span>Code</span>
+                    </a>
+                  </span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <section class="hero teaser">
+    <div class="container is-max-desktop">
+      <div class="hero-body" style="padding-top: 0;">
+        <img src="static/images/overview.png" alt="SparseDecoding overview">
+        <h2 class="subtitle is-size-6" style="text-align: left;">
+          <b>Overview of SparseDecoding.</b> Unlike standard pruning methods that collect calibration activations from fixed corpora, SparseDecoding calibrates on model-generated tokens from task prompts while discarding prefill activations. It also introduces a decoding-oriented <i>N</i>:<i>M</i> sparse execution pipeline with an optimized SpMV kernel, achieving up to <b>1.48×</b> decoding speedup in our experiments.
+        </h2>
+      </div>
+    </div>
+  </section>
+
+  <section class="section hero is-light">
+    <div class="container is-max-desktop">
+      <div class="columns is-centered has-text-centered">
+        <div class="column is-four-fifths">
+          <h2 class="title is-3">Abstract</h2>
+          <div class="content has-text-justified is-size-6">
+            <p>
+              The memory-bound nature of the decoding stage of large language model (LLM) inference incurs significant latency. Layer-wise training-free network pruning approaches guided by the Hessian have been a prominent solution, as pruning reduces the number of nonzero parameters read from memory during decoding. Nevertheless, typical methods compute the Hessian using pre-collected natural sequences, whereas the model is fed self-generated tokens during decoding, creating a distribution shift. We observe that this discrepancy hurts pruned model performance.
+            </p>
+            <p>
+              Moreover, most existing LLM pruning methods that bring actual speedup primarily target sparse matrix-matrix multiplication (SpMM), providing limited support for sparse matrix-vector (SpMV) operations, which dominate decoding.
+            </p>
+            <p>
+              To address these issues, we introduce <b>SparseDecoding</b>, a principled <i>decoding-aware</i> pruning framework. At the algorithmic axis, SparseDecoding constructs calibration matrices from layer-wise activations collected during dense-model autoregressive generation, excluding prefill. At the system axis, we develop an optimized <i>N</i>:<i>M</i> SpMV kernel with bitmask indexing and fixed-step traversal. Experiments on Llama-3.1-8B, Llama-3.3-70B, and Qwen3-14B/32B show consistent gains on long-form generation benchmarks and up to <b>1.48×</b> end-to-end wall-clock decoding speedup on A100 GPUs.
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section hero is-light">
+    <div class="container is-max-desktop">
+      <div class="columns is-centered has-text-centered">
+        <div class="column">
+          <h2 class="title is-3">Motivation</h2>
+          <div class="motivation-row">
+            <figure>
+              <img src="static/images/motivation_drift.png" alt="Activation discrepancy during decoding">
+              <figcaption class="subtitle is-size-6" style="text-align: left; margin-top: 0.75rem;">
+                (a) Relative activation discrepancy between the dense and pruned models grows rapidly during the first few decoding steps, then plateaus.
+              </figcaption>
+            </figure>
+            <figure>
+              <img src="static/images/motivation_speedup.png" alt="Prefill vs decoding speedup">
+              <figcaption class="subtitle is-size-6" style="text-align: left; margin-top: 0.75rem;">
+                (b) Existing 2:4 sparse Tensor Core kernels speed up prefill but fall below dense throughput during autoregressive decoding on Llama-3.1-8B (A100).
+              </figcaption>
+            </figure>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="hero is-small" style="margin-bottom: 4rem;">
+    <div class="hero-body">
+      <div class="container is-max-desktop">
+        <h2 class="title is-3 has-text-centered" style="margin-bottom: 0;">Main Results</h2>
+        <div id="results-carousel" class="carousel results-carousel">
+          <div class="item">
+            <img src="static/images/writingbench_table.png" alt="WritingBench results">
+            <h2 class="subtitle has-text-centered">
+              WritingBench under 50% and 2:4 sparsity. Highlighted rows are SparseDecoding.
+            </h2>
+          </div>
+          <div class="item">
+            <img src="static/images/classeval_table.png" alt="ClassEval results" style="max-width: 460px;">
+            <h2 class="subtitle has-text-centered">
+              ClassEval class-level Pass@1 under 50% and 2:4 sparsity.
+            </h2>
+          </div>
+          <div class="item">
+            <img src="static/images/kernel_speedup_table.png" alt="Decoding kernel speedup">
+            <h2 class="subtitle has-text-centered">
+              End-to-end decoding throughput of the N:M SpMV kernel on A100. All patterns keep 50% of the weights and reach 1.34–1.48× over dense.
+            </h2>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section" id="BibTeX">
+    <div class="container is-max-desktop content">
+      <div class="bibtex-header">
+        <h2 class="title">BibTeX</h2>
+        <button class="copy-bibtex-btn" onclick="copyBibTeX()" title="Copy BibTeX to clipboard">
+          <i class="fas fa-copy"></i>
+          <span class="copy-text">Copy</span>
+        </button>
+      </div>
+      <pre id="bibtex-code"><code>@article{wang2026sparsedecoding,
+  title={SparseDecoding: Decoding-Aware Pruning for Accurate and Efficient LLM Inference},
+  author={Wang, Qitong and Niu, Xinwei and Su, Mingluo and Zhao, Shanwei and Zhu, Shiai and Wang, Huan},
+  year={2026}
+}</code></pre>
+    </div>
+  </section>
+
+</body>
+</html>
