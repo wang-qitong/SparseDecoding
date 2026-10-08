@@ -42,6 +42,18 @@
 
   <style>
     .publication-authors { margin-bottom: 0.2rem; }
+    .motivation-row {
+      display: flex;
+      gap: 1.5rem;
+      align-items: flex-start;
+      justify-content: center;
+      margin-top: 0.5rem;
+    }
+    .motivation-row figure { flex: 1 1 0; margin: 0; min-width: 0; }
+    .motivation-row img { width: 100%; height: auto; display: block; }
+    @media (max-width: 768px) {
+      .motivation-row { flex-direction: column; }
+    }
   </style>
 </head>
 <body>
@@ -117,6 +129,17 @@
     </section>
   </main>
 
+  <section class="hero teaser">
+    <div class="container is-max-desktop">
+      <div class="hero-body" style="padding-top: 0;">
+        <img src="static/images/overview.png" alt="SparseDecoding overview">
+        <h2 class="subtitle is-size-6" style="text-align: left;">
+          <b>Overview of SparseDecoding.</b> Unlike standard pruning methods that collect calibration activations from fixed corpora, SparseDecoding calibrates on model-generated tokens from task prompts while discarding prefill activations. It also introduces a decoding-oriented <i>N</i>:<i>M</i> sparse execution pipeline with an optimized SpMV kernel, achieving up to <b>1.48×</b> decoding speedup in our experiments.
+        </h2>
+      </div>
+    </div>
+  </section>
+
   <section class="section hero is-light">
     <div class="container is-max-desktop">
       <div class="columns is-centered has-text-centered">
@@ -132,6 +155,58 @@
             <p>
               To address these issues, we introduce <b>SparseDecoding</b>, a principled <i>decoding-aware</i> pruning framework. At the algorithmic axis, SparseDecoding constructs calibration matrices from layer-wise activations collected during dense-model autoregressive generation, excluding prefill. At the system axis, we develop an optimized <i>N</i>:<i>M</i> SpMV kernel with bitmask indexing and fixed-step traversal. Experiments on Llama-3.1-8B, Llama-3.3-70B, and Qwen3-14B/32B show consistent gains on long-form generation benchmarks and up to <b>1.48×</b> end-to-end wall-clock decoding speedup on A100 GPUs.
             </p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section hero is-light">
+    <div class="container is-max-desktop">
+      <div class="columns is-centered has-text-centered">
+        <div class="column">
+          <h2 class="title is-3">Motivation</h2>
+          <div class="motivation-row">
+            <figure>
+              <img src="static/images/motivation_drift.png" alt="Activation discrepancy during decoding">
+              <figcaption class="subtitle is-size-6" style="text-align: left; margin-top: 0.75rem;">
+                (a) Relative activation discrepancy between the dense and pruned models grows rapidly during the first few decoding steps, then plateaus.
+              </figcaption>
+            </figure>
+            <figure>
+              <img src="static/images/motivation_speedup.png" alt="Prefill vs decoding speedup">
+              <figcaption class="subtitle is-size-6" style="text-align: left; margin-top: 0.75rem;">
+                (b) Existing 2:4 sparse Tensor Core kernels speed up prefill but fall below dense throughput during autoregressive decoding on Llama-3.1-8B (A100).
+              </figcaption>
+            </figure>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="hero is-small" style="margin-bottom: 4rem;">
+    <div class="hero-body">
+      <div class="container is-max-desktop">
+        <h2 class="title is-3 has-text-centered" style="margin-bottom: 0;">Main Results</h2>
+        <div id="results-carousel" class="carousel results-carousel">
+          <div class="item">
+            <img src="static/images/writingbench_table.png" alt="WritingBench results">
+            <h2 class="subtitle has-text-centered">
+              WritingBench under 50% and 2:4 sparsity. Highlighted rows are SparseDecoding.
+            </h2>
+          </div>
+          <div class="item">
+            <img src="static/images/classeval_table.png" alt="ClassEval results" style="max-width: 460px;">
+            <h2 class="subtitle has-text-centered">
+              ClassEval class-level Pass@1 under 50% and 2:4 sparsity.
+            </h2>
+          </div>
+          <div class="item">
+            <img src="static/images/kernel_speedup_table.png" alt="Decoding kernel speedup">
+            <h2 class="subtitle has-text-centered">
+              End-to-end decoding throughput of the N:M SpMV kernel on A100. All patterns keep 50% of the weights and reach 1.34–1.48× over dense.
+            </h2>
           </div>
         </div>
       </div>
