@@ -43,16 +43,25 @@
   <style>
     .publication-authors { margin-bottom: 0.2rem; }
     .motivation-row {
-      display: flex;
-      gap: 1.5rem;
-      align-items: flex-start;
-      justify-content: center;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      column-gap: 1.5rem;
       margin-top: 0.5rem;
     }
-    .motivation-row figure { flex: 1 1 0; margin: 0; min-width: 0; }
-    .motivation-row img { width: 100%; height: auto; display: block; }
+    .motivation-row figure {
+      display: grid;
+      grid-template-rows: subgrid;
+      grid-row: span 2;
+      row-gap: 0.75rem;
+      margin: 0;
+      min-width: 0;
+    }
+    .motivation-row img { width: 100%; height: auto; display: block; align-self: end; }
+    .motivation-row figcaption { margin: 0; }
     @media (max-width: 768px) {
-      .motivation-row { flex-direction: column; }
+      .motivation-row { grid-template-columns: 1fr; }
+      .motivation-row figure { display: block; grid-row: auto; }
+      .motivation-row figcaption { margin-top: 0.75rem; }
     }
   </style>
 </head>
@@ -160,13 +169,13 @@
           <div class="motivation-row">
             <figure>
               <img src="static/images/motivation_drift.png" alt="Activation discrepancy during decoding">
-              <figcaption class="subtitle is-size-6" style="text-align: left; margin-top: 0.75rem;">
+              <figcaption class="subtitle is-size-6" style="text-align: left;">
                 (a) Relative activation discrepancy between the dense and pruned models grows rapidly during the first few decoding steps, then plateaus.
               </figcaption>
             </figure>
             <figure>
               <img src="static/images/motivation_speedup.png" alt="Prefill vs decoding speedup">
-              <figcaption class="subtitle is-size-6" style="text-align: left; margin-top: 0.75rem;">
+              <figcaption class="subtitle is-size-6" style="text-align: left;">
                 (b) Existing 2:4 sparse Tensor Core kernels speed up prefill but fall below dense throughput during autoregressive decoding on Llama-3.1-8B (A100).
               </figcaption>
             </figure>
